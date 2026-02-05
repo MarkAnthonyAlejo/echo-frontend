@@ -1,62 +1,93 @@
-import { useState } from 'react'
+// echo-frontend/src/App.tsx
+import { useState } from 'react';
+import { useChat } from './hooks/useChat';
+import { Trash2, Send } from 'lucide-react';
 
 function App() {
-  const [prompt, setPrompt] = useState('');
-  const [response, setResponse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [input, setInput] = useState('');
+  const { history, isLoading, sendMessage, clearChat } = useChat();
 
-  const handleSend = async () => {
-    if (!prompt) return;
-    
-    setIsLoading(true);
-    try {
-      // Talking to your Node server on port 5001
-      const res = await fetch('http://localhost:5001/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
-      
-      const data = await res.json();
-      setResponse(data.response); // This will show the "Mock" message
-    } catch (error) {
-      console.error("Connection failed:", error);
-      setResponse("Error: Could not reach the backend.");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSend = () => {
+    if (!input.trim()) return;
+    sendMessage(input);
+    setInput('');
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4 text-blue-600">Echo AI</h1>
+    /* CENTERING ENGINE: 
+      'flex items-center justify-center' centers the child horizontally and vertically.
+      'w-screen' ensures we use the full width of the monitor.
+    */
+    <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-2 sm:p-4">
+      
+      {/* RESPONSIVE CONTAINER:
+        'w-full' = 100% width on Mobile (iPhone)
+        'md:max-w-3xl' = caps the width on Laptops/Desktops so it doesn't look stretched.
+      */}
+      <div className="w-full md:max-w-3xl bg-white rounded-xl sm:rounded-2xl shadow-2xl flex flex-col h-[95vh] sm:h-[85vh] overflow-hidden border border-slate-200">
         
-        <input 
-          className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-          type="text" 
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Ask something..."
-        />
-        
-        <button 
-          onClick={handleSend}
-          disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-        >
-          {isLoading ? 'Thinking...' : 'Send Prompt'}
-        </button>
-
-        {response && (
-          <div className="mt-6 p-4 bg-gray-50 border-l-4 border-blue-500 rounded text-gray-700">
-            <strong>AI Response:</strong>
-            <p className="mt-2">{response}</p>
+        {/* Header - Scaled padding for mobile */}
+        <header className="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+          <div className="flex flex-col">
+            <h1 className="text-xl sm:text-2xl font-black text-blue-600 tracking-tight leading-none">ECHO AI</h1>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Cognizant Assessment</span>
           </div>
-        )}
+          
+          <button 
+            onClick={clearChat}
+            className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <Trash2 size={16} />
+            <span className="hidden sm:inline text-sm font-semibold">Clear</span>
+          </button>
+        </header>
+
+        {/* Chat Body - Dynamic padding */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 bg-slate-50/50">
+          {history.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center px-4">
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">💬</div>
+              <p className="font-medium text-sm sm:text-base">Ready for your prompt. Start the conversation!</p>
+            </div>
+          ) : (
+            history.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[90%] sm:max-w-[80%] px-4 py-3 rounded-2xl ${
+                  msg.role === 'user' 
+                    ? 'bg-blue-600 text-white rounded-tr-none' 
+                    : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none shadow-sm'
+                }`}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-70">{msg.role}</p>
+                  <p className="text-sm sm:text-base leading-relaxed">{msg.content}</p>
+                </div>
+              </div>
+            ))
+          )}
+          {isLoading && <div className="animate-pulse text-slate-400 text-xs font-bold pl-2">AI IS TYPING...</div>}
+        </div>
+
+        {/* Input Area - Sticks to bottom */}
+        <footer className="p-3 sm:p-4 bg-white border-t border-slate-100">
+          <div className="flex gap-2 sm:gap-3 items-center">
+            <input 
+              className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-3 text-sm sm:text-base text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Message Echo AI..."
+            />
+            <button 
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white p-3 rounded-xl shadow-md active:scale-95 transition-transform"
+            >
+              <Send size={20} />
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
