@@ -1,14 +1,35 @@
 @import "tailwindcss";
 
-/* Ensure the root element takes up the full screen so our centering works */
-#root {
-  width: 100%;
-  margin: 0;
-  padding: 0;
+@theme {
+  --color-cognizant-midnight: #000048;
+  --color-cognizant-turquoise: #26EFE9;
+}
+
+/* THE FIX: Manually defining what happens when .dark is on the <html> tag */
+@layer base {
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Force the background and text colors so they CANNOT fail */
+  html.dark body {
+    background-color: #020617 !important; /* slate-950 */
+    color: white;
+  }
+
+  /* Ensure the card switches colors */
+  html.dark .bg-white {
+    background-color: #000048 !important; /* cognizant-midnight */
+  }
+
+  html.dark .text-cognizant-midnight {
+    color: white !important;
+  }
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Prevents unwanted horizontal scrolling on mobile */
+  background-color: #f1f5f9; /* slate-100 */
+  transition: all 0.3s ease-in-out;
 }

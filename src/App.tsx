@@ -1,11 +1,12 @@
-// echo-frontend/src/App.tsx
 import { useState } from 'react';
 import { useChat } from './hooks/useChat';
-import { Trash2, Send } from 'lucide-react';
+import { useTheme } from './hooks/useTheme'; 
+import { Trash2, Send, Sun, Moon, Box } from 'lucide-react';
 
 function App() {
   const [input, setInput] = useState('');
   const { history, isLoading, sendMessage, clearChat } = useChat();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -14,72 +15,79 @@ function App() {
   };
 
   return (
-    /* CENTERING ENGINE: 
-      'flex items-center justify-center' centers the child horizontally and vertically.
-      'w-screen' ensures we use the full width of the monitor.
-    */
-    <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-2 sm:p-4">
+    /* Outer wrapper stays centered */
+    <div className="fixed inset-0 flex items-center justify-center p-4 transition-colors duration-300">
       
-      {/* RESPONSIVE CONTAINER:
-        'w-full' = 100% width on Mobile (iPhone)
-        'md:max-w-3xl' = caps the width on Laptops/Desktops so it doesn't look stretched.
-      */}
-      <div className="w-full md:max-w-3xl bg-white rounded-xl sm:rounded-2xl shadow-2xl flex flex-col h-[95vh] sm:h-[85vh] overflow-hidden border border-slate-200">
+      {/* THE APP CARD */}
+      <div className="w-full max-w-4xl h-[85vh] flex flex-col bg-white dark:bg-cognizant-midnight rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all">
         
-        {/* Header - Scaled padding for mobile */}
-        <header className="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 flex justify-between items-center bg-white">
-          <div className="flex flex-col">
-            <h1 className="text-xl sm:text-2xl font-black text-blue-600 tracking-tight leading-none">ECHO AI</h1>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Cognizant Assessment</span>
+        {/* Header */}
+        <header className="flex items-center justify-between px-8 py-5 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-4">
+            <Box className="text-cognizant-turquoise" size={32} />
+            <div>
+              <h1 className="text-2xl font-black text-cognizant-midnight dark:text-white uppercase tracking-tighter">
+                Echo <span className="text-cognizant-turquoise">AI</span>
+              </h1>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Cognizant Research Lab</p>
+            </div>
           </div>
           
-          <button 
-            onClick={clearChat}
-            className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <Trash2 size={16} />
-            <span className="hidden sm:inline text-sm font-semibold">Clear</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={toggleTheme} 
+              className="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all active:scale-90"
+            >
+              {theme === 'light' ? <Moon size={22} /> : <Sun size={22} className="text-yellow-400" />}
+            </button>
+            <button onClick={clearChat} className="p-3 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all">
+              <Trash2 size={22} />
+            </button>
+          </div>
         </header>
 
-        {/* Chat Body - Dynamic padding */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 bg-slate-50/50">
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 dark:bg-slate-900/10">
           {history.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center px-4">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">💬</div>
-              <p className="font-medium text-sm sm:text-base">Ready for your prompt. Start the conversation!</p>
+            <div className="h-full flex flex-col items-center justify-center opacity-20 dark:text-white">
+              <Box size={80} className="mb-4" />
+              <p className="text-sm font-bold uppercase tracking-widest">Systems Online</p>
             </div>
           ) : (
             history.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[90%] sm:max-w-[80%] px-4 py-3 rounded-2xl ${
+                <div className={`max-w-[75%] px-6 py-4 rounded-3xl shadow-sm ${
                   msg.role === 'user' 
-                    ? 'bg-blue-600 text-white rounded-tr-none' 
-                    : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none shadow-sm'
+                    ? 'bg-cognizant-midnight dark:bg-blue-900 text-white rounded-tr-none' 
+                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-100 dark:border-slate-700 rounded-tl-none'
                 }`}>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-70">{msg.role}</p>
-                  <p className="text-sm sm:text-base leading-relaxed">{msg.content}</p>
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
                 </div>
               </div>
             ))
           )}
-          {isLoading && <div className="animate-pulse text-slate-400 text-xs font-bold pl-2">AI IS TYPING...</div>}
+          {isLoading && (
+             <div className="flex gap-2 p-2">
+                <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.2s]" />
+                <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.4s]" />
+             </div>
+          )}
         </div>
 
-        {/* Input Area - Sticks to bottom */}
-        <footer className="p-3 sm:p-4 bg-white border-t border-slate-100">
-          <div className="flex gap-2 sm:gap-3 items-center">
+        {/* Input area */}
+        <footer className="p-6 bg-white dark:bg-cognizant-midnight border-t border-slate-100 dark:border-slate-800">
+          <div className="relative flex items-center">
             <input 
-              className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-3 text-sm sm:text-base text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 text-base dark:text-white outline-none focus:ring-2 focus:ring-cognizant-turquoise transition-all pr-16"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Message Echo AI..."
+              placeholder="Inquire with Echo AI..."
             />
             <button 
               onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white p-3 rounded-xl shadow-md active:scale-95 transition-transform"
+              className="absolute right-2 bg-cognizant-turquoise hover:brightness-110 text-cognizant-midnight p-3 rounded-xl transition-all active:scale-95"
             >
               <Send size={20} />
             </button>
