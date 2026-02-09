@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useChat } from './hooks/useChat';
 import { useTheme } from './hooks/useTheme'; 
 import { Trash2, Send, Sun, Moon, Box } from 'lucide-react';
@@ -7,6 +7,19 @@ function App() {
   const [input, setInput] = useState('');
   const { history, isLoading, sendMessage, clearChat } = useChat();
   const { theme, toggleTheme } = useTheme();
+
+  // Create a reference to the bottom of the message list
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Function to smoothly scroll to the bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Trigger scroll every time history updates or AI starts thinking
+  useEffect(() => {
+    scrollToBottom();
+  }, [history, isLoading]);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -37,17 +50,22 @@ function App() {
             <button 
               onClick={toggleTheme} 
               className="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all active:scale-90"
+              aria-label="Toggle Theme"
             >
               {theme === 'light' ? <Moon size={22} /> : <Sun size={22} className="text-yellow-400" />}
             </button>
-            <button onClick={clearChat} className="p-3 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all">
+            <button 
+              onClick={clearChat} 
+              className="p-3 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all"
+              aria-label="Clear Chat"
+            >
               <Trash2 size={22} />
             </button>
           </div>
         </header>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 dark:bg-slate-900/10">
+        {/* Scrollable Messages Area */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 dark:bg-slate-900/10 scroll-smooth">
           {history.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-20 dark:text-white">
               <Box size={80} className="mb-4" />
@@ -66,6 +84,8 @@ function App() {
               </div>
             ))
           )}
+          
+          {/* Loading Animation */}
           {isLoading && (
              <div className="flex gap-2 p-2">
                 <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce" />
@@ -73,6 +93,9 @@ function App() {
                 <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.4s]" />
              </div>
           )}
+
+          {/* This empty div acts as an anchor for the auto-scroll feature */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input area */}
@@ -87,7 +110,8 @@ function App() {
             />
             <button 
               onClick={handleSend}
-              className="absolute right-2 bg-cognizant-turquoise hover:brightness-110 text-cognizant-midnight p-3 rounded-xl transition-all active:scale-95"
+              disabled={isLoading || !input.trim()}
+              className="absolute right-2 bg-cognizant-turquoise hover:brightness-110 disabled:opacity-50 text-cognizant-midnight p-3 rounded-xl transition-all active:scale-95"
             >
               <Send size={20} />
             </button>
