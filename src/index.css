@@ -5,21 +5,18 @@
   --color-cognizant-turquoise: #26EFE9;
 }
 
-/* THE FIX: Manually defining what happens when .dark is on the <html> tag */
 @layer base {
   html.dark {
     color-scheme: dark;
   }
 
-  /* Force the background and text colors so they CANNOT fail */
   html.dark body {
-    background-color: #020617 !important; /* slate-950 */
+    background-color: #020617 !important; 
     color: white;
   }
 
-  /* Ensure the card switches colors */
   html.dark .bg-white {
-    background-color: #000048 !important; /* cognizant-midnight */
+    background-color: #000048 !important;
   }
 
   html.dark .text-cognizant-midnight {
@@ -30,6 +27,6 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #f1f5f9; /* slate-100 */
+  background-color: #f1f5f9; 
   transition: all 0.3s ease-in-out;
 }

@@ -42,21 +42,37 @@ function App() {
             </div>
           </div>
           
+          {/* UPDATED HEADER BUTTONS WITH TOOLTIPS */}
           <div className="flex items-center gap-3">
-            <button 
-              onClick={toggleTheme} 
-              className="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all active:scale-90"
-              aria-label="Toggle Theme"
-            >
-              {theme === 'light' ? <Moon size={22} /> : <Sun size={22} className="text-yellow-400" />}
-            </button>
-            <button 
-              onClick={clearChat} 
-              className="p-3 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all"
-              aria-label="Clear Chat"
-            >
-              <Trash2 size={22} />
-            </button>
+            {/* THEME TOGGLE WITH TOOLTIP */}
+            <div className="relative group">
+              <button 
+                onClick={toggleTheme} 
+                className="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all active:scale-90"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'light' ? <Moon size={22} /> : <Sun size={22} className="text-yellow-400" />}
+              </button>
+              {/* Tooltip */}
+              <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+              </span>
+            </div>
+
+            {/* CLEAR CHAT WITH TOOLTIP */}
+            <div className="relative group">
+              <button 
+                onClick={clearChat} 
+                className="p-3 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all"
+                aria-label="Clear Chat"
+              >
+                <Trash2 size={22} />
+              </button>
+              {/* Tooltip */}
+              <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-red-600 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                Clear Chat
+              </span>
+            </div>
           </div>
         </header>
 
@@ -70,7 +86,6 @@ function App() {
           ) : (
             history.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {/* IMPROVED MESSAGE BUBBLE LOGIC */}
                 <div className={`max-w-[75%] px-6 py-4 rounded-3xl shadow-sm transition-all ${
                   msg.role === 'user' 
                     ? 'bg-cognizant-midnight dark:bg-blue-900 text-white rounded-tr-none' 

@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# Echo - Frontend Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for Echo, a responsive chat interface built for the Cognizant Research Lab technical Assessment. It features a modern UI, real time AI communication, and persistent user preferences.
 
-Currently, two official plugins are available:
+## ✨ Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **AI Chat Interface**: Real-time interaction with OpenAI via a dedicated backend proxy.
+- **Persistence**: Chat history is saved to `localStorage`, allowing conversations to persist across page refreshes.
+- **Theme Engine**: Toggle between Light and Dark modes with system persistence.
+- **Responsive Design**: Custom-branded UI using Tailwind CSS, optimized for all screen sizes.
+- **UX Polish**: Includes auto-scrolling to latest messages, loading animations, and interactive tooltips.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: React 19 (Vite)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Icons**: Lucide React
+- **State Management**: Custom Hooks and React Context
 
-## Expanding the ESLint configuration
+## 📂 Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```text
+src/
+├── context/         # ThemeContext & ThemeProvider logic
+├── hooks/           # useChat (logic/persistence) & useTheme hooks
+├── services/        # API communication layer (api.ts)
+├── App.tsx          # Main Application component & UI layout
+└── main.tsx         # Application entry point
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Setup Instructions
+1. Navigate to the frontend directory
+- cd echo-frontend
+2. install dependencies
+- npm install
+3. Backend REquirement
+- Ensure the Echo Backend is running on http://localhost:5001. This frontend is configured to communicate with the backend proxy to handle API requests securely.
+4. Start the development server
+- npm run dev
+- Open http://localhost:5173 in your browser to view the app.
 ```
