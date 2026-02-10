@@ -8,15 +8,12 @@ function App() {
   const { history, isLoading, sendMessage, clearChat } = useChat();
   const { theme, toggleTheme } = useTheme();
 
-  // Create a reference to the bottom of the message list
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Function to smoothly scroll to the bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Trigger scroll every time history updates or AI starts thinking
   useEffect(() => {
     scrollToBottom();
   }, [history, isLoading]);
@@ -28,7 +25,6 @@ function App() {
   };
 
   return (
-    /* Outer wrapper stays centered */
     <div className="fixed inset-0 flex items-center justify-center p-4 transition-colors duration-300">
       
       {/* THE APP CARD */}
@@ -74,10 +70,13 @@ function App() {
           ) : (
             history.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] px-6 py-4 rounded-3xl shadow-sm ${
+                {/* IMPROVED MESSAGE BUBBLE LOGIC */}
+                <div className={`max-w-[75%] px-6 py-4 rounded-3xl shadow-sm transition-all ${
                   msg.role === 'user' 
                     ? 'bg-cognizant-midnight dark:bg-blue-900 text-white rounded-tr-none' 
-                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-100 dark:border-slate-700 rounded-tl-none'
+                    : msg.content.includes("Error") || msg.content.includes("Could not reach")
+                      ? 'bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 rounded-tl-none'
+                      : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-100 dark:border-slate-700 rounded-tl-none'
                 }`}>
                   <p className="text-sm leading-relaxed">{msg.content}</p>
                 </div>
@@ -87,14 +86,15 @@ function App() {
           
           {/* Loading Animation */}
           {isLoading && (
-             <div className="flex gap-2 p-2">
-                <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.2s]" />
-                <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.4s]" />
+             <div className="flex justify-start">
+               <div className="bg-white dark:bg-slate-800 px-6 py-4 rounded-3xl rounded-tl-none border border-slate-100 dark:border-slate-700 flex gap-2 items-center">
+                  <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.2s]" />
+                  <div className="w-2 h-2 bg-cognizant-turquoise rounded-full animate-bounce [animation-delay:0.4s]" />
+               </div>
              </div>
           )}
 
-          {/* This empty div acts as an anchor for the auto-scroll feature */}
           <div ref={messagesEndRef} />
         </div>
 
@@ -102,7 +102,7 @@ function App() {
         <footer className="p-6 bg-white dark:bg-cognizant-midnight border-t border-slate-100 dark:border-slate-800">
           <div className="relative flex items-center">
             <input 
-              className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 text-base dark:text-white outline-none focus:ring-2 focus:ring-cognizant-turquoise transition-all pr-16"
+              className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 text-base dark:text-white outline-none focus:ring-2 focus:ring-cognizant-turquoise transition-all pr-16 placeholder:text-slate-400"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -111,7 +111,7 @@ function App() {
             <button 
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="absolute right-2 bg-cognizant-turquoise hover:brightness-110 disabled:opacity-50 text-cognizant-midnight p-3 rounded-xl transition-all active:scale-95"
+              className="absolute right-2 bg-cognizant-turquoise hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed text-cognizant-midnight p-3 rounded-xl transition-all active:scale-95"
             >
               <Send size={20} />
             </button>
